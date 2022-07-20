@@ -15,7 +15,8 @@ class BusController extends Controller
      */
     public function index()
     {
-        
+        $busses = Bus::all();
+        return response()->json($busses, 200);
     }
 
     /**
@@ -36,7 +37,8 @@ class BusController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $bus = Bus::create($request->all());
+        return response()->json("create bus success", 200);
     }
 
     /**
@@ -70,7 +72,11 @@ class BusController extends Controller
      */
     public function update(Request $request, Bus $bus)
     {
-        //
+        if ($bus->update($request->all())) {
+            return response()->json("Update bus success");
+        } else {
+            return response()->json("Failed to update bus");
+        }
     }
 
     /**
@@ -81,6 +87,10 @@ class BusController extends Controller
      */
     public function destroy(Bus $bus)
     {
-        //
+        if ($bus->delete()) {
+            return response()->json("Delete bus success");
+        } else {
+            return response()->json("Failed to delete bus");
+        }
     }
 }
