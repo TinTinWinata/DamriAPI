@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\BusController;
+use App\Http\Controllers\Api\DriverController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/auth/logout', [UserController::class, 'logout']);
 
     Route::apiResource('/buses', BusController::class);
+    Route::apiResource('/drivers', DriverController::class);
+    Route::apiResource('/orders', OrderController::class);
 });
 
 Route::post('/auth/login', [UserController::class, 'login']);

@@ -17,7 +17,9 @@ class DriverFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->name(),
+            'age' => $this->faker->numberBetween(20, 80),
+            'id_number' => $this->faker->text(15),
         ];
     }
 }

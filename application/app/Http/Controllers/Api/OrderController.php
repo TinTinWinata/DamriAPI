@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bus;
+use App\Models\Driver;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
@@ -15,7 +18,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $order = Order::all();
+        return response()->json($order, 200);
     }
 
     /**
@@ -34,9 +38,106 @@ class OrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+
+
+
+
+    public function validDate($startDate, $endDate, $newDate, $newEnd)
+    {
+        if ($startDate < $newDate && $endDate > $newDate && $startDate < $newEnd && $endDate > $newEnd) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getDriver($date)
+    {
+        $allDriver = Driver::with('orders')->get();
+        foreach ($allDriver as $driver) {
+
+            // Validasi jika tidak ada order
+            // return count($bus->orders);
+
+            if (count($driver->orders) == 0) {
+                return $driver;
+            }
+
+            // Validasi jika order bakal di check
+            foreach ($driver->orders as $orderDriver) {
+                $data = [
+                    strtotime($orderDriver->start_rent_date),
+                    strtotime($orderDriver['start_rent_date']) + $orderDriver['total_rent_days'],
+                    strtotime($date['start_rent_date']),
+                    strtotime($date['start_rent_date']) + $date['total_rent_days']
+                ];
+
+                if ($this->validDate($data[0], $data[1], $data[2], $data[3])) {
+                    return $driver;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function getBus($date)
+    {
+        $allBus = Bus::with('orders')->get();
+        foreach ($allBus as $bus) {
+
+            // Validasi jika tidak ada order
+            if (count($bus->orders) == 0) {
+                return $bus;
+            }
+
+            // Validasi jika order bakal di check
+            foreach ($bus->orders as $orderBus) {
+                $data = [
+                    strtotime($orderBus->start_rent_date),
+                    strtotime($orderBus['start_rent_date']) + $orderBus['total_rent_days'],
+                    strtotime($date['start_rent_date']),
+                    strtotime($date['start_rent_date']) + $date['total_rent_days']
+                ];
+
+                if ($this->validDate($data[0], $data[1], $data[2], $data[3])) {
+                    return $bus;
+                }
+            }
+        }
+        return false;
+    }
+
     public function store(Request $request)
     {
-        //
+        $date = $request->only('start_rent_date', 'total_rent_days');
+        $bus = $this->getBus($date);
+        $driver = $this->getDriver($date);
+
+        if ($bus === false || $driver === false) {
+            return response()->json("There's no driver or bus available at this momment!", 401);
+        }
+
+
+        $rule = [
+            'contact_name' => 'required',
+            'contact_phone' => 'numeric | required',
+            'start_rent_date' => 'date|after:tomorrow|required',
+            'total_rent_days' => 'required',
+        ];
+
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response()->json("Invalid field", 422);
+        }
+
+        $newOrder = $request->all();
+        $newOrder['bus_id'] = $bus->id;
+        $newOrder['driver_id'] = $driver->id;
+
+        Order::create($newOrder);
+        return response()->json("create order success", 200);
     }
 
     /**
@@ -70,7 +171,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        //
+        return response()->json("You cannot update the order", 200);
     }
 
     /**
@@ -81,6 +182,10 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+        if ($order->delete()) {
+            return response()->json("Delete order success", 200);
+        } else {
+            return response()->json("Failed to delete order", 422);
+        }
     }
 }

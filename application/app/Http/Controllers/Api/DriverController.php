@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Driver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class DriverController extends Controller
 {
@@ -15,7 +17,8 @@ class DriverController extends Controller
      */
     public function index()
     {
-        //
+        $driver = Driver::all();
+        return response()->json($driver, 200);
     }
 
     /**
@@ -36,7 +39,20 @@ class DriverController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rule = [
+            'name' => 'required',
+            'age' => 'numeric | min:18',
+            'id_number' => 'unique:drivers|min:16',
+        ];
+
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response()->json("Invalid field", 422);
+        }
+
+        Driver::create($request->all());
+        return response()->json("create driver success", 200);
     }
 
     /**
@@ -70,7 +86,23 @@ class DriverController extends Controller
      */
     public function update(Request $request, Driver $driver)
     {
-        //
+        $rule = [
+            'name' => 'required',
+            'age' => 'numeric | min:18',
+            'id_number' => 'unique:drivers|min:16',
+        ];
+
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response()->json("Invalid field", 422);
+        }
+
+        if ($driver->update($request->all())) {
+            return response()->json("Update driver success", 200);
+        } else {
+            return response()->json("Failed to update driver", 422);
+        }
     }
 
     /**
@@ -81,6 +113,10 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver)
     {
-        //
+        if ($driver->delete()) {
+            return response()->json("Delete driver success", 200);
+        } else {
+            return response()->json("Failed to delete driver", 422);
+        }
     }
 }

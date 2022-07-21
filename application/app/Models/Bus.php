@@ -14,5 +14,10 @@ class Bus extends Model
         'price_per_day'
     ];
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'bus_id', 'id');
+    }
+
     use HasFactory;
 }
