@@ -20,13 +20,29 @@ form.addEventListener("submit", function (e) {
     },
   };
 
-  fetch("http://example.com/movies.json")
-    .then((response) => response.json())
-    .then((data) => console.log(data));
+  $.ajax({
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "text/plain;charset=utf-8",
+    },
+    type: "POST",
+    url: API_URL_LOGIN,
+    data: `{R
+      "username" : ${username},
+      "password" : ${password},
+    }`,
+    success: function (resp) {
+      console.log(resp);
+    },
+    dataType: "json",
+  });
 
   // fetch(API_URL_LOGIN, data)
   //   .then((resp) => {
-  //     console.log(resp.json());
+  //     resp.json();
+  //   })
+  //   .then((resp) => {
+  //     console.log(resp);
   //   })
   //   .catch((err) => {
   //     alert(err);
