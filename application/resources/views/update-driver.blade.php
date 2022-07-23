@@ -9,7 +9,12 @@
             <form id="submit-form">
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
+                    <input type="text" class="form-control" id="name" name="id" disabled
+                        value="{{ $id }}">
+                </div>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" class="form-control" id="name" name="username" placeholder="Enter name">
                 </div>
                 <div class="form-group">
                     <label for="age">Age</label>
@@ -27,4 +32,4 @@
 @endsection
 
 
-<script defer type="module" src="{{ asset('/js/createDriver.js') }}"></script>
+<script defer type="module" src="{{ asset('/js/updateDriver.js') }}"></script>

@@ -93,7 +93,7 @@ class BusController extends Controller
             'seat' => 'numeric | min:1 | required',
             'price_per_day' => 'numeric | min:100000 | required',
         ];
-        
+
         $valid = Validator::make($request->all(), $rule);
 
         if ($valid->fails()) {

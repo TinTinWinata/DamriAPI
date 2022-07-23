@@ -18,7 +18,7 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $order = Order::all();
+        $order = Order::with('driver')->with('bus')->get();
         return response()->json($order, 200);
     }
 
@@ -171,7 +171,36 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        return response()->json("You cannot update the order", 200);
+        $date = $request->only('start_rent_date', 'total_rent_days');
+        $bus = $this->getBus($date);
+        $driver = $this->getDriver($date);
+
+        if ($bus === false || $driver === false) {
+            return response()->json("There's no driver or bus available at this momment!", 401);
+        }
+
+        $rule = [
+            'contact_name' => 'required',
+            'contact_phone' => 'numeric | required',
+            'start_rent_date' => 'date|after:tomorrow|required',
+            'total_rent_days' => 'required',
+        ];
+
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response()->json("Invalid field", 422);
+        }
+
+        $newOrder = $request->all();
+        $newOrder['bus_id'] = $bus->id;
+        $newOrder['driver_id'] = $driver->id;
+
+        if ($bus->update($newOrder)) {
+            return response()->json("Update order success", 200);
+        } else {
+            return response()->json("Failed to update bus", 422);
+        }
     }
 
     /**

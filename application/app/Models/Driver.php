@@ -10,7 +10,7 @@ class Driver extends Model
     protected $fillable = [
         'name',
         'age',
-        'id',
+        'id_number',
     ];
 
     public function orders()

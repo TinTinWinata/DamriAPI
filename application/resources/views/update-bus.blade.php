@@ -10,6 +10,11 @@
             <form id="submit-form">
                 <div class="form-group">
                     <label for="plate-number">Plate Number</label>
+                    <input type="text" id="busId" disabled class="form-control" id="plate-number" name="id"
+                        value="{{ $id }}">
+                </div>
+                <div class="form-group">
+                    <label for="plate-number">Plate Number</label>
                     <input type="text" class="form-control" id="plate-number" name="plate_number"
                         placeholder="Enter plate number">
                 </div>
@@ -38,4 +43,4 @@
 @endsection
 
 
-<script type="module" src="{{ asset('js/createBus.js') }}" defer></script>
+<script type="module" src="{{ asset('js/updateBus.js') }}" defer></script>

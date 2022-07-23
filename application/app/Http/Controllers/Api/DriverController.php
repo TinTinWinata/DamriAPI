@@ -40,7 +40,7 @@ class DriverController extends Controller
     public function store(Request $request)
     {
         $rule = [
-            'name' => 'required',
+            'name' => 'string | required',
             'age' => 'numeric | min:18',
             'id_number' => 'unique:drivers|min:16',
         ];
